@@ -1,0 +1,18 @@
+.bigboiscreens {
+    height: 65vh;
+}
+
+.placeholderchat {
+    height: 40vh;
+}
+
+.app_name {
+    font-size: 10vh;
+    font-weight: normal;
+    margin-top: 7vh;
+}
+
+.tagline {
+    font-size: 3vh;
+    font-weight: normal;
+}
