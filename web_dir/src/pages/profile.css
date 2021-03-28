@@ -4,13 +4,17 @@
 } */
 
 .profile {
-    display:center;
+    position: absolute;
+    left: 40%;
+    right: 40%;
 }
 
 .profile_image {
-    height: 30vh;
+    height: 15vw;
+    margin-left: 1vw;
 }
 
 .profile_text {
     font-size: 24px;
+    margin-left: 28%;
 }

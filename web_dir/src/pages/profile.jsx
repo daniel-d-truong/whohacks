@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import profile_image from '../images/profile_image.png';
 import './profile.css';
-/* We simply can use an array and loop and print each user */
+import { BrowserRouter as Router, Link} from "react-router-dom";
 
 export const Grid = styled.div` 
 
@@ -12,45 +12,70 @@ export const Grid = styled.div`
 
 export const Row = styled.div`
   display:flex;
-  margin-top:5%;
+  margin-top:10%;
+  padding:5%;
+  text-align:center;
 `;
 
-export const Col = styled.div`
-  display:${(props) => props.size};
-  margin-right:10%;
-`;
+class ProfilePage extends React.Component {
+  constructor() {
+    super();
 
-const ProfilePage = () => {
-  return (
-    <div className="profile">
-      <Grid>
-      <Row>
-          <div className="profile_text">
-            welcome, [user]!
-          </div>
-        </Row>
+    this.state = {
+      isSubmitted: false,
+      name: "",
+    }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleNameInput = this.handleNameInput.bind(this);
+  }
+
+  handleNameInput = (e) => {
+    this.setState({name: e.target.value});
+    console.log(e.target.value);
+  }
+
+  handleSubmit = formSubmitEvent => {
+    formSubmitEvent.preventDefault();
+
+    this.setState({
+      isSubmitted: true,
+    })
+
+    this.props.history.push('/video');
+  };
+
+  render () {
+    return (
+      <div className="profile">
+        <Grid>
         <Row>
-          <div className="profile_image">
-            <img src={profile_image} className="profile_image"/>
-          </div>
-        </Row>
-        <Row>
-          <div className="profile_text">
-            <Button bsPrefix="custom-button" onClick={() => { alert('clicked') }}>
-              create room
-            </Button>
-          </div>
-        </Row>
-        <Row>
-          <div className="profile_text">
-            <Button bsPrefix="custom-button" onClick={() => { alert('clicked') }}>
-              join room
-            </Button>
-          </div>
-        </Row>
-      </Grid>
-    </div>
-  );
+            <div className="profile_text">
+              welcome {this.state.isSubmitted ? this.state.name : null} !!
+            </div>
+          </Row>
+          <Row>
+            <div className="profile_image">
+              <img src={profile_image} className="profile_image"/>
+            </div>
+          </Row>
+          <Row>
+            <form onSubmit={this.handleSubmit} noValidate>
+              <label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  placeholder="your name here" 
+                  onChange={(e) => this.handleNameInput(e)}
+                  required/>
+              </label>
+              <button>get started</button>
+            </form>
+          </Row>
+        </Grid>
+      </div>
+    );
+  }
 };
 
 export default ProfilePage;
