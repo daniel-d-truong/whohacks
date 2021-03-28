@@ -1,0 +1,24 @@
+.Videos {
+    width: 60vw;
+    height: 60vh;
+}
+
+.d-flex div {
+    font-family: "Muli";
+    margin-left: 10%;
+    margin-bottom: 10%;
+    margin-top: 10%;
+    background-color: #EBEBEB;
+    padding: 1.5%;
+    width: 50vw;
+    overflow: auto;
+}
+
+.video_item {
+    font-family: "Muli";
+    margin-left: 10%;
+    margin-bottom: 10%;
+    background-color: #EBEBEB;
+    padding: 1.5%;
+    flex-basis: 50%;
+}

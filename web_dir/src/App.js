@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import MainPage from "./pages";
 import UsersPage from "./pages/users";
+import VideoPage from "./pages/video";
 import NotFoundPage from "./pages/404";
 import Navbar from './components/navBar/navBar';
 
@@ -22,6 +23,7 @@ class App extends Component {
             <Switch>
                 <Route exact path="/" component={MainPage} />
                 <Route exact path="/users" component={UsersPage} /> 
+                <Route exact path="/video" component={VideoPage} />
                 <Route exact component={NotFoundPage} />
             </Switch>
         </Router>
