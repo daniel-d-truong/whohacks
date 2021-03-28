@@ -6,7 +6,9 @@ import './profile.css';
 import { BrowserRouter as Router, Link} from "react-router-dom";
 
 export const Grid = styled.div` 
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const Row = styled.div`
@@ -23,6 +25,7 @@ class ProfilePage extends React.Component {
     this.state = {
       isSubmitted: false,
       name: "",
+      room: "",
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -31,12 +34,13 @@ class ProfilePage extends React.Component {
 
   handleNameInput = (e) => {
     this.setState({name: e.target.value});
-    console.log(e.target.value);
+  }
+
+  handleRoomInput = (e) => {
+    this.setState({room: e.target.value});
   }
 
   handleSubmit = formSubmitEvent => {
-    formSubmitEvent.preventDefault();
-
     this.setState({
       isSubmitted: true,
     })
@@ -48,29 +52,35 @@ class ProfilePage extends React.Component {
     return (
       <div className="profile">
         <Grid>
-        <Row>
+          <Row>
             <div className="profile_text">
               welcome {this.state.isSubmitted ? this.state.name : null} !!
             </div>
           </Row>
-          <Row>
-            <div className="profile_image">
-              <img src={profile_image} className="profile_image"/>
-            </div>
-          </Row>
-          <Row>
-            <form onSubmit={this.handleSubmit} noValidate>
-              <label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  placeholder="your name here" 
-                  onChange={(e) => this.handleNameInput(e)}
-                  required/>
-              </label>
-              <button>get started</button>
-            </form>
-          </Row>
+          <div className="profile_image">
+            <img alt="Profile" src={profile_image} className="profile_image"/>
+          </div>
+          <div className="input-form">
+            <input 
+              className="input-field flex-item"
+              type="text" 
+              placeholder="your name here" 
+              onChange={this.handleNameInput}
+              required/>
+            <input
+              className="input-field flex-item"
+              type="text"
+              placeholder="room code"
+              onChange={this.handleRoomInput}
+              required/>
+            <Link to={{
+              pathname: "/video",
+              state: {
+                name: this.state.name,
+                room: this.state.room,
+              }
+            }} className="get-started flex-item">Get started!</Link>
+          </div>
         </Grid>
       </div>
     );

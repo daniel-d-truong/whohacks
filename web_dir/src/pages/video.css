@@ -12,3 +12,11 @@
     width: 30vw;
     height: 35vh;
 }
+
+.Messages {
+    font-family: "Muli";
+    background-color: #FAFAFA;
+    padding: 1.5%;
+    width: 20vw;
+    height: 76.5vh;
+}
