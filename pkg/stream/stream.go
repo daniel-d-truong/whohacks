@@ -102,18 +102,9 @@ func speechToText(bytesChan <-chan []byte, trackName string) {
 		log.Fatal(err)
 	}
 
-	// // throw away request
-	// stream.Send(&speechpb.StreamingRecognizeRequest{
-	// 	StreamingRequest: &speechpb.StreamingRecognizeRequest_AudioContent{
-	// 		AudioContent: []byte("abcdef"),
-	// 	},
-	// })
-
 	go func() {
 		// Pipe stdin to the API.
-		// buf := make([]byte, 1024)
 		for {
-			// n, err := bytesBuffer.Read(buf)
 			buf := <-bytesChan
 			// logger.Infof("number of bytes sent: %d", len(buf))
 			if len(buf) > 0 {
@@ -147,31 +138,9 @@ func speechToText(bytesChan <-chan []byte, trackName string) {
 		resp, err := stream.Recv()
 		logger.Infof("response: %s", resp.String())
 
-		/*
-
-			this function will have a map
-			{
-				1: "oh baby"
-			}
-
-			each message sent:
-				{
-					"id": "1",
-					"transcript": "oh",
-					"name": "person speaking",
-					"timestamp": "date"
-				},
-				{
-					"id": "1",
-					"transcript": "oh baby"
-				}
-
-
-		*/
-
 		if dc != nil {
 			results := resp.GetResults()
-			if len(results) > 0 {
+			if len(results) > 0 && len(results[0].GetAlternatives()) {
 				msg := Message{
 					ID:         currentId,
 					Transcript: resp.GetResults()[0].GetAlternatives()[0].GetTranscript(),
@@ -212,7 +181,7 @@ func speechToText(bytesChan <-chan []byte, trackName string) {
 	}
 }
 
-func CreateClient(addr string, session string) {
+func CreateClient(addr string, session string) (*sdk.Client, error) {
 	// add stun servers
 	webrtcCfg := webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
@@ -239,19 +208,27 @@ func CreateClient(addr string, session string) {
 
 	c.OnTrack = onTrack
 
+	// get audio level indication
+	// c.OnDataChannel = func(dataChannel *webrtc.DataChannel) {
+
+	// 	dataChannel.OnMessage(func(msg webrtc.DataChannelMessage) {
+	// 		logger.Infof("data: %s", string(msg.Data))
+	// 	})
+	// }
+
 	// client join a session
 	err := c.Join(session)
 
 	// publish file to session if needed
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err)
+		return nil, err
 	}
 
-	dc, err = c.CreateDataChannel("data2")
+	// create data channel to send things
+	dc, err = c.CreateDataChannel("transcription")
 	if err != nil {
-		fmt.Println(err.Error())
-		panic(err)
+		return nil, err
 	}
-	select {}
+
+	return c, nil
 }
