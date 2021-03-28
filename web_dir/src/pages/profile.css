@@ -1,0 +1,16 @@
+/* .bg-custom-button {
+    background-color: #FFD7F6;
+    font-family: "Questrial";
+} */
+
+.profile {
+    display:center;
+}
+
+.profile_image {
+    height: 30vh;
+}
+
+.profile_text {
+    font-size: 24px;
+}
