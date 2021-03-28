@@ -12,210 +12,210 @@ class EchoTest extends React.Component {
         this.controlLocalAudio = this.controlLocalAudio.bind(this);
         this.controlLocalVideo = this.controlLocalVideo.bind(this);
         this.controlRemoteVideo = this.controlRemoteVideo.bind(this);
-    }
-
-    const localVideo = document.getElementById("local-video");
-    const remoteVideo = document.getElementById("remote-video");
-    const localData = document.getElementById("local-data");
-    const remoteData = document.getElementById("remote-data");
-    const sizeTag = document.getElementById("size-tag");
-    const brTag = document.getElementById("br-tag");
-    let simulcast = false;
-    let localDataChannel;
-
-    remoteVideo.addEventListener("loadedmetadata", function () {
-        sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
-    });
-
-    remoteVideo.onresize = function () {
-        sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
-    };
-
-    /* eslint-env browser */
-    const joinBtns = document.getElementById("start-btns");
-
-    const getQueryVariable = (key) => {
-        var query = window.location.search.substring(1);
-        var vars = query.split("&");
-        for (var i=0;i<vars.length;i++) {
-                var pair = vars[i].split("=");
-                if(pair[0] == key){return pair[1];}
-        }
-        return(false);
-    };
-
-    const sid = getQueryVariable("sid") || "room1";
-    const uid = getQueryVariable("uid") || uuidv4();
-
-    const signalLocal = new IonSDK.IonSFUJSONRPCSignal(
-        //"ws://localhost:8443/ws?uid=tony&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ0b255IiwicmlkIjoicm9vbTEifQ.mopgibW3OYONYwzlo-YvkDIkNoYJc3OBQRsqQHZMnD8"
-        "ws://localhost:8443/ws?uid=" + uuidv4()
-    );
-    const signalRemote = new IonSDK.IonSFUJSONRPCSignal(
-        "ws://localhost:8443/ws?uid=" + uuidv4()
-    );
-
-    const clientLocal = new IonSDK.Client(signalLocal);
-    const clientRemote = new IonSDK.Client(signalRemote);
-
-    let localStream;
-    const start = (sc) => {
-        clientLocal.join(sid);
-        clientRemote.join(sid);
-        simulcast = sc;
-        IonSDK.LocalStream.getUserMedia({
-            resolution: "hd",
-            simulcast: sc,
-            audio: true,
-        })
-            .then((media) => {
-                localStream = media;
-                localVideo.srcObject = media;
-                localVideo.autoplay = true;
-                localVideo.controls = true;
-                localVideo.muted = true;
-                joinBtns.style.display = "none";
-                clientLocal.publish(media);
-            })
-            .catch(console.error);
-        localDataChannel = clientLocal.createDataChannel("data");
-    };
-
-    const send = () => {
-        if (localDataChannel.readyState === "open") {
-            localDataChannel.send(localData.value);
-        }
-    };
-
-    let remoteStream;
-    clientRemote.ontrack = (track, stream) => {
-        if (track.kind === "video") {
-            remoteStream = stream;
-            remoteVideo.srcObject = stream;
-            remoteVideo.autoplay = true;
-
-            getStats();
-
-            document
-            .querySelectorAll(".controls")
-            .forEach((el) => (el.style.display = "block"));
-            if (simulcast) {
-                document.getElementById("simulcast-controls").style.display =
-                "block";
-            } else {
-                document.getElementById("simple-controls").style.display = "block";
-            }
-        }
-    };
-
-    clientRemote.ondatachannel = ({ channel }) => {
-        channel.onmessage = ({ data }) => {
-            remoteData.innerHTML = data;
-        };
-    };
-
-    const api = {
-        streamId: "",
-        video: "high",
-        audio: true,
-    };
-
-    function controlRemoteVideo = (radio) => {
-        remoteStream.preferLayer(radio.value);
-    
-        // update ui
-        api.streamId = remoteStream.id;
-        api.video = radio.value;
-        const str = JSON.stringify(api, null, 2);
-        document.getElementById("api").innerHTML = syntaxHighlight(str);
-    };
-    
-    function controlRemoteAudio = (radio) => {
-        if (radio.value === "true") {
-            remoteStream.mute("audio");
-        } else {
-            remoteStream.unmute("audio");
-        }
-    
-        // update ui
-        api.streamId = remoteStream.id;
-        api.audio = radio.value === "true";
-        const str = JSON.stringify(api, null, 2);
-        document.getElementById("api").innerHTML = syntaxHighlight(str);
-    };
-    
-    function controlLocalVideo = (radio) => {
-        if (radio.value === "false") {
-            localStream.mute("video");
-        } else {
-            localStream.unmute("video");
-        }
-    };
-    
-    function controlLocalAudio = (radio){
-        if (radio.value === "false") {
-            localStream.mute("audio");
-        } else {
-            localStream.unmute("audio");
-        }
-    };
-    
-    function syntaxHighlight(json) {
-        json = json
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-        
-        return json.replace(
-            /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-            function (match) {
-            let cls = "number";
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                cls = "key";
-                } else {
-                cls = "string";
-                }
-            } else if (/true|false/.test(match)) {
-                cls = "boolean";
-            } else if (/null/.test(match)) {
-                cls = "null";
-            }
-            return '<span class="' + cls + '">' + match + "</span>";
-            }
-        );
-    };
-    
-    getStats = () => {
-        let bytesPrev;
-        let timestampPrev;
-        setInterval(() => {
-            clientRemote.getSubStats(null).then((results) => {
-            results.forEach((report) => {
-                const now = report.timestamp;
-    
-                let bitrate;
-                if (
-                report.type === "inbound-rtp" &&
-                report.mediaType === "video"
-                ) {
-                const bytes = report.bytesReceived;
-                if (timestampPrev) {
-                    bitrate = (8 * (bytes - bytesPrev)) / (now - timestampPrev);
-                    bitrate = Math.floor(bitrate);
-                }
-                bytesPrev = bytes;
-                timestampPrev = now;
-                }
-                if (bitrate) {
-                brTag.innerHTML = `${bitrate} kbps`;
-                }
-            });
-            });
-        }, 1000);
     };
 
     render () {
+        const localVideo = document.getElementById("local-video");
+        const remoteVideo = document.getElementById("remote-video");
+        const localData = document.getElementById("local-data");
+        const remoteData = document.getElementById("remote-data");
+        const sizeTag = document.getElementById("size-tag");
+        const brTag = document.getElementById("br-tag");
+        let simulcast = false;
+        let localDataChannel;
+
+        remoteVideo.addEventListener("loadedmetadata", function () {
+            sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+        });
+
+        remoteVideo.onresize = function () {
+            sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+        };
+
+        /* eslint-env browser */
+        const joinBtns = document.getElementById("start-btns");
+
+        const getQueryVariable = (key) => {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i=0;i<vars.length;i++) {
+                    var pair = vars[i].split("=");
+                    if(pair[0] == key){return pair[1];}
+            }
+            return(false);
+        };
+
+        const sid = getQueryVariable("sid") || "room1";
+        const uid = getQueryVariable("uid") || uuidv4();
+
+        const signalLocal = new IonSDK.IonSFUJSONRPCSignal(
+            //"ws://localhost:8443/ws?uid=tony&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ0b255IiwicmlkIjoicm9vbTEifQ.mopgibW3OYONYwzlo-YvkDIkNoYJc3OBQRsqQHZMnD8"
+            "ws://localhost:8443/ws?uid=" + uuidv4()
+        );
+        const signalRemote = new IonSDK.IonSFUJSONRPCSignal(
+            "ws://localhost:8443/ws?uid=" + uuidv4()
+        );
+
+        const clientLocal = new IonSDK.Client(signalLocal);
+        const clientRemote = new IonSDK.Client(signalRemote);
+
+        let localStream;
+        const start = (sc) => {
+            clientLocal.join(sid);
+            clientRemote.join(sid);
+            simulcast = sc;
+            IonSDK.LocalStream.getUserMedia({
+                resolution: "hd",
+                simulcast: sc,
+                audio: true,
+            })
+                .then((media) => {
+                    localStream = media;
+                    localVideo.srcObject = media;
+                    localVideo.autoplay = true;
+                    localVideo.controls = true;
+                    localVideo.muted = true;
+                    joinBtns.style.display = "none";
+                    clientLocal.publish(media);
+                })
+                .catch(console.error);
+            localDataChannel = clientLocal.createDataChannel("data");
+        };
+
+        const send = () => {
+            if (localDataChannel.readyState === "open") {
+                localDataChannel.send(localData.value);
+            }
+        };
+
+        let remoteStream;
+        clientRemote.ontrack = (track, stream) => {
+            if (track.kind === "video") {
+                remoteStream = stream;
+                remoteVideo.srcObject = stream;
+                remoteVideo.autoplay = true;
+
+                getStats();
+
+                document
+                .querySelectorAll(".controls")
+                .forEach((el) => (el.style.display = "block"));
+                if (simulcast) {
+                    document.getElementById("simulcast-controls").style.display =
+                    "block";
+                } else {
+                    document.getElementById("simple-controls").style.display = "block";
+                }
+            }
+        };
+
+        clientRemote.ondatachannel = ({ channel }) => {
+            channel.onmessage = ({ data }) => {
+                remoteData.innerHTML = data;
+            };
+        };
+
+        const api = {
+            streamId: "",
+            video: "high",
+            audio: true,
+        };
+
+        function controlRemoteVideo = (radio) => {
+            remoteStream.preferLayer(radio.value);
+        
+            // update ui
+            api.streamId = remoteStream.id;
+            api.video = radio.value;
+            const str = JSON.stringify(api, null, 2);
+            document.getElementById("api").innerHTML = syntaxHighlight(str);
+        };
+        
+        function controlRemoteAudio = (radio) => {
+            if (radio.value === "true") {
+                remoteStream.mute("audio");
+            } else {
+                remoteStream.unmute("audio");
+            }
+        
+            // update ui
+            api.streamId = remoteStream.id;
+            api.audio = radio.value === "true";
+            const str = JSON.stringify(api, null, 2);
+            document.getElementById("api").innerHTML = syntaxHighlight(str);
+        };
+        
+        function controlLocalVideo = (radio) => {
+            if (radio.value === "false") {
+                localStream.mute("video");
+            } else {
+                localStream.unmute("video");
+            }
+        };
+        
+        function controlLocalAudio = (radio){
+            if (radio.value === "false") {
+                localStream.mute("audio");
+            } else {
+                localStream.unmute("audio");
+            }
+        };
+        
+        function syntaxHighlight(json) {
+            json = json
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            
+            return json.replace(
+                /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+                function (match) {
+                let cls = "number";
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                    cls = "key";
+                    } else {
+                    cls = "string";
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = "boolean";
+                } else if (/null/.test(match)) {
+                    cls = "null";
+                }
+                return '<span class="' + cls + '">' + match + "</span>";
+                }
+            );
+        };
+        
+        getStats = () => {
+            let bytesPrev;
+            let timestampPrev;
+            setInterval(() => {
+                clientRemote.getSubStats(null).then((results) => {
+                results.forEach((report) => {
+                    const now = report.timestamp;
+        
+                    let bitrate;
+                    if (
+                    report.type === "inbound-rtp" &&
+                    report.mediaType === "video"
+                    ) {
+                    const bytes = report.bytesReceived;
+                    if (timestampPrev) {
+                        bitrate = (8 * (bytes - bytesPrev)) / (now - timestampPrev);
+                        bitrate = Math.floor(bitrate);
+                    }
+                    bytesPrev = bytes;
+                    timestampPrev = now;
+                    }
+                    if (bitrate) {
+                    brTag.innerHTML = `${bitrate} kbps`;
+                    }
+                });
+                });
+            }, 1000);
+        };
+
         return (
             <div>
                 <MetaTags>

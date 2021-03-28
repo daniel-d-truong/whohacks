@@ -5,7 +5,8 @@ class MeetingBox extends Component {
     render () {
         return (
             <div>
-                <p>HELLO</p>
+                <div className="userBox">
+                </div>
             </div>
         );
     }
