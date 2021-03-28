@@ -41,7 +41,7 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	if strings.EqualFold(codec.MimeType, webrtc.MimeTypeOpus) {
 		logger.Infof("Got Opus track")
 
-		go speechToText(audioStream)
+		go speechToText(audioStream, track.ID())
 
 		for {
 			rtpPacket, _, err := track.ReadRTP()
@@ -71,7 +71,7 @@ func decode(decoder *opusDecoder, audioChunk []byte) chan []byte {
 	return decodeBool
 }
 
-func speechToText(bytesChan <-chan []byte) {
+func speechToText(bytesChan <-chan []byte, trackName string) {
 	logger.Infof("calling speechToText")
 	ctx := context.Background()
 
@@ -175,7 +175,7 @@ func speechToText(bytesChan <-chan []byte) {
 				msg := Message{
 					ID:         currentId,
 					Transcript: resp.GetResults()[0].GetAlternatives()[0].GetTranscript(),
-					Name:       "Daniel",
+					Name:       trackName,
 				}
 
 				msgByte, err := json.Marshal(msg)
