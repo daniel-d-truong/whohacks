@@ -27,7 +27,6 @@ type Message struct {
 var dc *webrtc.DataChannel
 
 func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
-
 	codec := track.Codec()
 	logger.Infof("calling onTrack with codec: %s", codec.MimeType)
 
@@ -35,18 +34,22 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 
 	opusDecoder, err := newDecoder()
 	if err != nil {
-		panic(err)
+		logger.Errorf(err.Error())
+		return
 	}
 
 	if strings.EqualFold(codec.MimeType, webrtc.MimeTypeOpus) {
 		logger.Infof("Got Opus track")
 
-		go speechToText(audioStream, track.ID())
+		done := make(chan bool)
+		go speechToText(audioStream, track.ID(), done)
 
 		for {
 			rtpPacket, _, err := track.ReadRTP()
 			if err != nil {
-				panic(err)
+				logger.Errorf(err.Error())
+				done <- true
+				return
 			}
 
 			audioChunkChan := decode(opusDecoder, rtpPacket.Payload)
@@ -71,17 +74,19 @@ func decode(decoder *opusDecoder, audioChunk []byte) chan []byte {
 	return decodeBool
 }
 
-func speechToText(bytesChan <-chan []byte, trackName string) {
+func speechToText(bytesChan <-chan []byte, trackName string, done chan bool) {
 	logger.Infof("calling speechToText")
 	ctx := context.Background()
 
 	client, err := speech.NewClient(ctx)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorf(err.Error())
+		return
 	}
 	stream, err := client.StreamingRecognize(ctx)
 	if err != nil {
-		log.Fatal(err)
+		logger.Errorf(err.Error())
+		return
 	}
 	// Send the initial configuration message.
 	if err := stream.Send(&speechpb.StreamingRecognizeRequest{
@@ -105,42 +110,42 @@ func speechToText(bytesChan <-chan []byte, trackName string) {
 	go func() {
 		// Pipe stdin to the API.
 		for {
-			buf := <-bytesChan
-			// logger.Infof("number of bytes sent: %d", len(buf))
-			if len(buf) > 0 {
-				if err := stream.Send(&speechpb.StreamingRecognizeRequest{
-					StreamingRequest: &speechpb.StreamingRecognizeRequest_AudioContent{
-						AudioContent: buf,
-					},
-				}); err != nil {
-					log.Printf("Could not send audio: %v", err)
+			select {
+			case buf := <-bytesChan:
+				if len(buf) > 0 {
+					if err := stream.Send(&speechpb.StreamingRecognizeRequest{
+						StreamingRequest: &speechpb.StreamingRecognizeRequest_AudioContent{
+							AudioContent: buf,
+						},
+					}); err != nil {
+						log.Printf("Could not send audio: %v", err)
+					}
 				}
-			}
-			if len(buf) == 0 {
-				// Nothing else to pipe, close the stream.
-				if err := stream.CloseSend(); err != nil {
-					log.Fatalf("Could not close stream: %v", err)
+				if len(buf) == 0 {
+					// Nothing else to pipe, close the stream.
+					if err := stream.CloseSend(); err != nil {
+						log.Printf("Could not close stream: %v", err)
+					}
+					return
 				}
+				if err != nil {
+					log.Printf("Could not read from stdin: %v", err)
+					continue
+				}
+			case <-done:
 				return
-			}
-			if err != nil {
-				log.Printf("Could not read from stdin: %v", err)
-				continue
 			}
 		}
 	}()
 
-	logger.Infof("started running goroutine")
-
 	currentId := shortuuid.New()
 	for {
-		logger.Infof("expecting received stream")
 		resp, err := stream.Recv()
 		logger.Infof("response: %s", resp.String())
 
 		if dc != nil {
 			results := resp.GetResults()
-			if len(results) > 0 && len(results[0].GetAlternatives()) {
+			if len(results) > 0 && len(results[0].GetAlternatives()) > 0 {
 				msg := Message{
 					ID:         currentId,
 					Transcript: resp.GetResults()[0].GetAlternatives()[0].GetTranscript(),
@@ -173,7 +178,8 @@ func speechToText(bytesChan <-chan []byte, trackName string) {
 			if err.Code == 3 || err.Code == 11 {
 				log.Print("WARNING: Speech recognition request exceeded limit of 60 seconds.")
 			}
-			log.Fatalf("Could not recognize: %v", err)
+			log.Printf("Could not recognize: %v", err)
+			return
 		}
 		for _, result := range resp.Results {
 			fmt.Printf("Result: %+v\n", result)

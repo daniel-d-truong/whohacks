@@ -1,0 +1,349 @@
+[2021-03-28 03:07:23.429] [INFO] [47][signal.go][NewSignal] => [client id] Connecting to sfu ok: localhost:50051
+[2021-03-28 03:07:23.448] [DEBUG] [244][stream.go][CreateClient] => [Client.Join] sid=test session id=client id
+[2021-03-28 03:07:23.449] [INFO] [142][signal.go][Join] => [client id] [Signal.Join] sid=test session uid=client id, offer={offer v=0
+o=- 2428530279359044798 1616926043 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 BA:2B:F8:DD:96:FE:E9:CB:5F:EC:D6:F0:64:B7:44:B7:08:80:EC:E1:4F:DF:6C:A6:46:71:24:7D:98:72:A2:71
+a=group:BUNDLE 0
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:0
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:SOeUWXFVVusmsDoU
+a=ice-pwd:NObgeUEOhOxfRYUWaRmPJKnkupDvxVYA
+ 0xc00042c240}
+[2021-03-28 03:07:23.450] [DEBUG] [252][stream.go][CreateClient] => id=client id CreateDataChannel data2
+[2021-03-28 03:07:23.460] [INFO] [97][signal.go][onSignalHandle] => [client id] [join] got answer: {"type":"answer","sdp":"v=0\r\no=- 2643623269823205336 1616926043 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\na=fingerprint:sha-256 E9:5F:66:5C:01:E6:B0:FA:8D:C7:1B:1C:64:86:51:B4:63:4A:4E:B1:D5:F6:C3:DD:7D:50:E3:84:95:6E:AC:CA\r\na=group:BUNDLE 0\r\nm=application 9 UDP/DTLS/SCTP webrtc-datachannel\r\nc=IN IP4 0.0.0.0\r\na=setup:active\r\na=mid:0\r\na=sendrecv\r\na=sctp-port:5000\r\na=ice-ufrag:XFkjJoJLFeorqQgl\r\na=ice-pwd:vxrExzonFNAddOSCrVnNTXUuQYLoEuBq\r\n"}
+[2021-03-28 03:07:23.460] [DEBUG] [102][client.go][SetRemoteSDP] => id=client id sending c.pub.SendCandidates cand=udp4 host 192.168.1.115:51826
+[2021-03-28 03:07:23.460] [INFO] [168][signal.go][Trickle] => [client id] [Signal.Trickle] candidate=udp4 host 192.168.1.115:51826 target=0
+[2021-03-28 03:07:23.460] [DEBUG] [102][client.go][SetRemoteSDP] => id=client id sending c.pub.SendCandidates cand=udp6 host 2603:8000:4602:2de:1036:dd9c:9f8b:2798:51827
+[2021-03-28 03:07:23.460] [INFO] [168][signal.go][Trickle] => [client id] [Signal.Trickle] candidate=udp6 host 2603:8000:4602:2de:1036:dd9c:9f8b:2798:51827 target=0
+[2021-03-28 03:07:23.461] [DEBUG] [102][client.go][SetRemoteSDP] => id=client id sending c.pub.SendCandidates cand=udp6 host 2603:8000:4602:2de:5979:c3aa:55df:884c:51828
+[2021-03-28 03:07:23.461] [INFO] [168][signal.go][Trickle] => [client id] [Signal.Trickle] candidate=udp6 host 2603:8000:4602:2de:5979:c3aa:55df:884c:51828 target=0
+[2021-03-28 03:07:23.461] [INFO] [133][signal.go][onSignalHandle] => [client id] [trickle] type=PUBLISHER candidate={candidate:4009983154 1 udp 2130706431 172.21.0.3 5161 typ host 0xc0004daff0 0xc00049ef08 <nil>}
+[2021-03-28 03:07:23.461] [DEBUG] [233][client.go][Trickle] => id=client id candidate={candidate:4009983154 1 udp 2130706431 172.21.0.3 5161 typ host 0xc0004daff0 0xc00049ef08 <nil>} target=0
+[2021-03-28 03:07:23.496] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp4 srflx 45.48.197.60:61660 related 0.0.0.0:61660 target=0
+[2021-03-28 03:07:23.525] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp4 srflx 45.48.197.60:53553 related 0.0.0.0:53553 target=0
+[2021-03-28 03:07:23.709] [INFO] [118][signal.go][onSignalHandle] => [client id] [description] got offer call s.OnNegotiate sdp={Type:offer SDP:v=0
+o=- 1233264769156572897 1616926043 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 DE:31:24:39:89:9D:F2:F8:FC:54:A0:68:55:FF:9C:CB:14:49:37:29:BB:B9:1C:B6:85:BB:62:21:4C:D3:DD:9A
+a=group:BUNDLE 0 1 2
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:0
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:111 opus/48000/2
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtcp-fb:111 transport-cc 
+a=ssrc:1542598424 cname:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:1542598424 msid:df80188c-6995-46b8-82b6-1c5b913c5ebf d2552980-e7e0-4dc7-b700-cb9cdda965fa
+a=ssrc:1542598424 mslabel:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:1542598424 label:d2552980-e7e0-4dc7-b700-cb9cdda965fa
+a=msid:df80188c-6995-46b8-82b6-1c5b913c5ebf d2552980-e7e0-4dc7-b700-cb9cdda965fa
+a=sendonly
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:1
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 goog-remb 
+a=rtcp-fb:96 transport-cc 
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack 
+a=rtcp-fb:96 nack pli
+a=ssrc:2165157543 cname:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:2165157543 msid:df80188c-6995-46b8-82b6-1c5b913c5ebf eb98fc6e-66d3-4725-9eaa-e12fa5e10075
+a=ssrc:2165157543 mslabel:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:2165157543 label:eb98fc6e-66d3-4725-9eaa-e12fa5e10075
+a=msid:df80188c-6995-46b8-82b6-1c5b913c5ebf eb98fc6e-66d3-4725-9eaa-e12fa5e10075
+a=sendonly
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:2
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+ parsed:<nil>}
+[2021-03-28 03:07:23.709] [DEBUG] [254][client.go][Negotiate] => id=client id Negotiate sdp={offer v=0
+o=- 1233264769156572897 1616926043 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 DE:31:24:39:89:9D:F2:F8:FC:54:A0:68:55:FF:9C:CB:14:49:37:29:BB:B9:1C:B6:85:BB:62:21:4C:D3:DD:9A
+a=group:BUNDLE 0 1 2
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:0
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:111 opus/48000/2
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtcp-fb:111 transport-cc 
+a=ssrc:1542598424 cname:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:1542598424 msid:df80188c-6995-46b8-82b6-1c5b913c5ebf d2552980-e7e0-4dc7-b700-cb9cdda965fa
+a=ssrc:1542598424 mslabel:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:1542598424 label:d2552980-e7e0-4dc7-b700-cb9cdda965fa
+a=msid:df80188c-6995-46b8-82b6-1c5b913c5ebf d2552980-e7e0-4dc7-b700-cb9cdda965fa
+a=sendonly
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:1
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 goog-remb 
+a=rtcp-fb:96 transport-cc 
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack 
+a=rtcp-fb:96 nack pli
+a=ssrc:2165157543 cname:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:2165157543 msid:df80188c-6995-46b8-82b6-1c5b913c5ebf eb98fc6e-66d3-4725-9eaa-e12fa5e10075
+a=ssrc:2165157543 mslabel:df80188c-6995-46b8-82b6-1c5b913c5ebf
+a=ssrc:2165157543 label:eb98fc6e-66d3-4725-9eaa-e12fa5e10075
+a=msid:df80188c-6995-46b8-82b6-1c5b913c5ebf eb98fc6e-66d3-4725-9eaa-e12fa5e10075
+a=sendonly
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:2
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+ <nil>}
+[2021-03-28 03:07:23.711] [INFO] [213][signal.go][Answer] => [client id] [Signal.Answer] sdp={answer v=0
+o=- 8887042272433903955 1616926043 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 D4:CA:AD:2D:B7:12:1A:3B:BB:11:A0:63:CD:C7:81:E3:C5:BA:B3:F9:A8:2D:7C:5A:61:82:AC:F4:94:72:C1:6D
+a=group:BUNDLE 0 1 2
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 0.0.0.0
+a=setup:active
+a=mid:0
+a=ice-ufrag:QlBkzZjfmxRQCNEt
+a=ice-pwd:QTrHRWLXHotTyOqGwdaUTvlDFgHvzqxW
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:111 opus/48000/2
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtcp-fb:111 transport-cc 
+a=recvonly
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=setup:active
+a=mid:1
+a=ice-ufrag:QlBkzZjfmxRQCNEt
+a=ice-pwd:QTrHRWLXHotTyOqGwdaUTvlDFgHvzqxW
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 goog-remb 
+a=rtcp-fb:96 transport-cc 
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack 
+a=rtcp-fb:96 nack pli
+a=recvonly
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:active
+a=mid:2
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:QlBkzZjfmxRQCNEt
+a=ice-pwd:QTrHRWLXHotTyOqGwdaUTvlDFgHvzqxW
+ 0xc00042dc20}
+[2021-03-28 03:07:23.711] [INFO] [133][signal.go][onSignalHandle] => [client id] [trickle] type=SUBSCRIBER candidate={candidate:4009983154 1 udp 2130706431 172.21.0.3 5009 typ host 0xc0007003c0 0xc0000c03f0 <nil>}
+[2021-03-28 03:07:23.711] [DEBUG] [233][client.go][Trickle] => id=client id candidate={candidate:4009983154 1 udp 2130706431 172.21.0.3 5009 typ host 0xc0007003c0 0xc0000c03f0 <nil>} target=1
+[2021-03-28 03:07:23.711] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp4 host 192.168.1.115:64702 target=1
+[2021-03-28 03:07:23.711] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp6 host 2603:8000:4602:2de:1036:dd9c:9f8b:2798:64703 target=1
+[2021-03-28 03:07:23.712] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp6 host 2603:8000:4602:2de:5979:c3aa:55df:884c:64704 target=1
+[2021-03-28 03:07:23.727] [DEBUG] [174][peerconnection.go][func1] => id=client id [c.sub.pc.OnDataChannel] got dc ion-sfu
+[2021-03-28 03:07:23.727] [DEBUG] [174][peerconnection.go][func1] => client id got dc ion-sfu
+[2021-03-28 03:07:23.727] [DEBUG] [174][peerconnection.go][func1] => id=client id [c.sub.pc.OnDataChannel] got dc data2
+[2021-03-28 03:07:23.728] [DEBUG] [174][peerconnection.go][func1] => client id got dc data2
+[2021-03-28 03:07:23.728] [DEBUG] [174][peerconnection.go][func1] => id=client id [c.sub.pc.OnDataChannel] got dc dataaaaa
+[2021-03-28 03:07:23.728] [DEBUG] [174][peerconnection.go][func1] => client id got dc dataaaaa
+[2021-03-28 03:07:23.745] [DEBUG] [114][client.go][func1] => [c.sub.pc.OnTrack] got track streamId=df80188c-6995-46b8-82b6-1c5b913c5ebf kind=audio ssrc=1542598424 
+[2021-03-28 03:07:23.745] [DEBUG] [117][client.go][func1] => id=client id len(c.remoteStreamId)=1
+[2021-03-28 03:07:23.745] [INFO] [32][stream.go][onTrack] => calling onTrack with codec: audio/opus
+[2021-03-28 03:07:23.745] [INFO] [42][stream.go][onTrack] => Got Opus track
+[2021-03-28 03:07:23.745] [INFO] [75][stream.go][speechToText] => calling speechToText
+[2021-03-28 03:07:23.749] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp4 srflx 45.48.197.60:58478 related 0.0.0.0:58478 target=1
+[2021-03-28 03:07:23.771] [DEBUG] [114][client.go][func1] => [c.sub.pc.OnTrack] got track streamId=df80188c-6995-46b8-82b6-1c5b913c5ebf kind=video ssrc=2165157543 
+[2021-03-28 03:07:23.772] [DEBUG] [117][client.go][func1] => id=client id len(c.remoteStreamId)=1
+[2021-03-28 03:07:23.772] [INFO] [32][stream.go][onTrack] => calling onTrack with codec: video/VP8
+[2021-03-28 03:07:23.791] [INFO] [68][transport.go][func1] => [client id] [Signal.Trickle] candidate=udp4 srflx 45.48.197.60:64466 related 0.0.0.0:64466 target=1
+[2021-03-28 03:07:24.009] [INFO] [135][stream.go][speechToText] => started running goroutine
+[2021-03-28 03:07:24.009] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:07:28.453] [INFO] [57][transport.go][func1] => gather candidate done
+[2021-03-28 03:07:28.713] [INFO] [57][transport.go][func1] => gather candidate done
+[2021-03-28 03:07:38.732] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:13  nanos:430000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:13  nanos:430000000}
+[2021-03-28 03:07:38.733] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:07:49.597] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:24  nanos:370000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:24  nanos:370000000}
+[2021-03-28 03:07:49.597] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:07:50.187] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:25  nanos:690000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:25  nanos:690000000}
+[2021-03-28 03:07:50.187] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:07:53.561] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:28  nanos:910000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:28  nanos:910000000}
+[2021-03-28 03:07:53.561] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:05.454] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:40  nanos:280000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:40  nanos:280000000}
+[2021-03-28 03:08:05.454] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:08.825] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:44  nanos:170000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:44  nanos:170000000}
+[2021-03-28 03:08:08.825] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:11.111] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:46  nanos:600000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:46  nanos:600000000}
+[2021-03-28 03:08:11.113] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:14.239] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:49  nanos:710000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:49  nanos:710000000}
+[2021-03-28 03:08:14.240] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:16.518] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:51  nanos:970000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:51  nanos:970000000}
+[2021-03-28 03:08:16.518] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:20.524] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:55  nanos:860000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:55  nanos:860000000}
+[2021-03-28 03:08:20.524] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:21.584] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:57  nanos:50000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:57  nanos:50000000}
+[2021-03-28 03:08:21.584] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:26.013] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:61  nanos:460000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:61  nanos:460000000}
+[2021-03-28 03:08:26.013] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:30.798] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:66  nanos:170000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:66  nanos:170000000}
+[2021-03-28 03:08:30.798] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:33.301] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:68  nanos:730000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:68  nanos:730000000}
+[2021-03-28 03:08:33.301] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:37.310] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:72  nanos:830000000}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:72  nanos:830000000}
+[2021-03-28 03:08:37.310] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:40.550] [INFO] [141][stream.go][speechToText] => response: results:{alternatives:{}  is_final:true  result_end_time:{seconds:76}}
+Result: alternatives:{}  is_final:true  result_end_time:{seconds:76}
+[2021-03-28 03:08:40.550] [INFO] [139][stream.go][speechToText] => expecting received stream
+[2021-03-28 03:08:44.242] [INFO] [118][signal.go][onSignalHandle] => [client id] [description] got offer call s.OnNegotiate sdp={Type:offer SDP:v=0
+o=- 5626704950519365679 1616926124 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 DE:31:24:39:89:9D:F2:F8:FC:54:A0:68:55:FF:9C:CB:14:49:37:29:BB:B9:1C:B6:85:BB:62:21:4C:D3:DD:9A
+a=group:BUNDLE 0 1 2
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:0
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:111 opus/48000/2
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtcp-fb:111 transport-cc 
+a=inactive
+a=candidate:4009983154 1 udp 2130706431 172.21.0.3 5009 typ host
+a=candidate:4009983154 2 udp 2130706431 172.21.0.3 5009 typ host
+a=end-of-candidates
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:1
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 goog-remb 
+a=rtcp-fb:96 transport-cc 
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack 
+a=rtcp-fb:96 nack pli
+a=inactive
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:2
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+ parsed:<nil>}
+[2021-03-28 03:08:44.243] [DEBUG] [254][client.go][Negotiate] => id=client id Negotiate sdp={offer v=0
+o=- 5626704950519365679 1616926124 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 DE:31:24:39:89:9D:F2:F8:FC:54:A0:68:55:FF:9C:CB:14:49:37:29:BB:B9:1C:B6:85:BB:62:21:4C:D3:DD:9A
+a=group:BUNDLE 0 1 2
+m=audio 9 UDP/TLS/RTP/SAVPF 111
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:0
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:111 opus/48000/2
+a=fmtp:111 minptime=10;useinbandfec=1
+a=rtcp-fb:111 transport-cc 
+a=inactive
+a=candidate:4009983154 1 udp 2130706431 172.21.0.3 5009 typ host
+a=candidate:4009983154 2 udp 2130706431 172.21.0.3 5009 typ host
+a=end-of-candidates
+m=video 9 UDP/TLS/RTP/SAVPF 96
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:1
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+a=rtcp-mux
+a=rtcp-rsize
+a=rtpmap:96 VP8/90000
+a=rtcp-fb:96 goog-remb 
+a=rtcp-fb:96 transport-cc 
+a=rtcp-fb:96 ccm fir
+a=rtcp-fb:96 nack 
+a=rtcp-fb:96 nack pli
+a=inactive
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:2
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:ZIjQPBNxdNRfDuln
+a=ice-pwd:KfMEJhHapEanyYUxthgocqqLVNhrrDEN
+ <nil>}
+panic: EOF
+
+goroutine 172 [running]:
+github.com/daniel-d-truong/whohacks/pkg/stream.onTrack(0xc00013a120, 0xc0002f3bc0)
+	/Users/danieltruong/projects/hoohacks/whohacks/pkg/stream/stream.go:49 +0x2e8
+github.com/pion/ion-sdk-go.(*Client).Join.func1(0xc00013a120, 0xc0002f3bc0)
+	/Users/danieltruong/go/pkg/mod/github.com/pion/ion-sdk-go@v0.4.0/client.go:121 +0x536
+created by github.com/pion/webrtc/v3.(*PeerConnection).onTrack
+	/Users/danieltruong/go/pkg/mod/github.com/pion/webrtc/v3@v3.0.11/peerconnection.go:451 +0x10f
+exit status 2
+FAIL	github.com/daniel-d-truong/whohacks/pkg/stream	81.300s

@@ -385,7 +385,7 @@
             clientLocal.publish(media);
           })
           .catch(console.error);
-        localDataChannel = clientLocal.createDataChannel("data");
+        localDataChannel = clientLocal.createDataChannel("dataaaaa");
       };
 
       const send = () => {
@@ -416,6 +416,7 @@
       };
 
       clientRemote.ondatachannel = ({ channel }) => {
+        console.log(channel);
         channel.onmessage = ({ data }) => {
           let decodedString = String.fromCharCode.apply(null, new Uint8Array(data));
           let obj = JSON.parse(decodedString);
@@ -501,8 +502,12 @@
         setInterval(() => {
           clientRemote.getSubStats(null).then((results) => {
             results.forEach((report) => {
+              // console.log(report)
               const now = report.timestamp;
-
+              if (report.audioLevel) {
+                console.log(report)
+              }
+              // console.log(report)
               let bitrate;
               if (
                 report.type === "inbound-rtp" &&

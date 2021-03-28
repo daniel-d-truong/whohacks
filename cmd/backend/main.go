@@ -21,7 +21,7 @@ func main() {
 
 	app := fiber.New()
 
-	// GET request with roomID and name in body
+	// POST request with roomID and name in body
 	// /join
 	app.Post("/join", func(c *fiber.Ctx) error {
 		// if room didn't exist, create client
