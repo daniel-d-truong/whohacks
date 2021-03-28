@@ -8,10 +8,10 @@ class EchoTest extends React.Component {
         super(props);
         this.state = {};
 
-        this.controlRemoteAudio = this.controlRemoteAudio.bind(this);
-        this.controlLocalAudio = this.controlLocalAudio.bind(this);
-        this.controlLocalVideo = this.controlLocalVideo.bind(this);
-        this.controlRemoteVideo = this.controlRemoteVideo.bind(this);
+        // this.controlRemoteAudio = this.controlRemoteAudio.bind(this);
+        // this.controlLocalAudio = this.controlLocalAudio.bind(this);
+        // this.controlLocalVideo = this.controlLocalVideo.bind(this);
+        // this.controlRemoteVideo = this.controlRemoteVideo.bind(this);
     };
 
     render () {

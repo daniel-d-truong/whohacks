@@ -36,17 +36,3 @@
     transform: rotate(360deg);
   }
 }
-
-.gridding {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
-.grid_card {
-  padding: 5vh;
-}
-
-.first {
-  flex-grow: 2;
-}
