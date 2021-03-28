@@ -35,13 +35,18 @@ spec:
         - name: sfu
           image: pionwebrtc/ion-sfu:latest-allrpc
           command: ["/usr/local/bin/sfu", "-c", "/configs/sfu.toml", "-jaddr", "127.0.0.1:7000", "-gaddr", "127.0.0.1:50051" ]
-          resources:
-            limits:
-              cpu: 500m
-              memory: 500Mi
-            requests:
-              cpu: 500m
-              memory: 500Mi
+          ports:
+          - containerPort: 50051
+            name: grpc
+          - containerPort: 7000
+            name: jsonrpc
+          # resources:
+          #   limits:
+          #     cpu: 500m
+          #     memory: 500Mi
+          #   requests:
+          #     cpu: 500m
+          #     memory: 500Mi
 
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
