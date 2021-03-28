@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 
 	speech "cloud.google.com/go/speech/apiv1"
 	logger "github.com/pion/ion-log"
@@ -23,43 +22,46 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	codec := track.Codec()
 	logger.Infof("calling onTrack with codec: %s", codec.MimeType)
 
-	// audioChan := make(chan []byte)
+	audioStream := make(chan []byte)
+
+	opusDecoder, err := newDecoder()
+	if err != nil {
+		panic(err)
+	}
 
 	if strings.EqualFold(codec.MimeType, webrtc.MimeTypeOpus) {
 		logger.Infof("Got Opus track")
 
 		var buf bytes.Buffer
 		audioWriter, err := oggwriter.NewWith(&buf, 16000, 1)
-		fileWriter, err := oggwriter.New("file.ogg", 16000, 1)
-		defer fileWriter.Close()
-
 		if err != nil {
 			audioWriter.Close()
 		}
 
-		go speechToText(&buf)
+		go speechToText(audioStream)
 
 		// timer := time.NewTicker(time.Second)
-		// filledBuffer := make([]byte, 1024)
 
 		for {
 			// n, _, err := track.Read(buf)
-
-			// // rtpPacket, _, err := track.ReadRTP()
-			// if err != nil {
-			// 	panic(err)
-			// }
-
-			// audioChan <- buf[:n]
 
 			rtpPacket, _, err := track.ReadRTP()
 			if err != nil {
 				panic(err)
 			}
-			if err := audioWriter.WriteRTP(rtpPacket); err != nil {
-				panic(err)
-			}
-			fileWriter.WriteRTP(rtpPacket)
+
+			audioChunkChan := decode(opusDecoder, rtpPacket.Payload)
+			audioChunk := <-audioChunkChan
+
+			audioStream <- audioChunk
+
+			// rtpPacket, _, err := track.ReadRTP()
+			// if err != nil {
+			// 	panic(err)
+			// }
+			// if err := audioWriter.WriteRTP(rtpPacket); err != nil {
+			// 	panic(err)
+			// }
 
 			// // // only read if we get to 1024 bytes?
 			// // if buf.Len() > 1024 {
@@ -68,7 +70,7 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 			// 	panic(err)
 			// }
 
-			// audioChan <- filledBuffer[:n]
+			// audioStream <- filledBuffer[:n]
 			// }
 
 		}
@@ -76,7 +78,21 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 
 }
 
-func speechToText(bytesBuffer *bytes.Buffer) {
+func decode(decoder *opusDecoder, audioChunk []byte) chan []byte {
+	decodeBool := make(chan []byte)
+	go func() {
+		decodedChunk, err := decoder.decode(audioChunk)
+		if err != nil {
+			logger.Errorf("error received: %s", err.Error())
+			decodeBool <- []byte{}
+		}
+		decodeBool <- decodedChunk
+	}()
+
+	return decodeBool
+}
+
+func speechToText(bytesChan <-chan []byte) {
 	logger.Infof("calling speechToText")
 	ctx := context.Background()
 
@@ -93,20 +109,16 @@ func speechToText(bytesBuffer *bytes.Buffer) {
 		StreamingRequest: &speechpb.StreamingRecognizeRequest_StreamingConfig{
 			StreamingConfig: &speechpb.StreamingRecognitionConfig{
 				Config: &speechpb.RecognitionConfig{
-					Encoding:          speechpb.RecognitionConfig_OGG_OPUS,
+					Encoding:          speechpb.RecognitionConfig_LINEAR16,
 					SampleRateHertz:   16000,
 					LanguageCode:      "en-US",
-					AudioChannelCount: 1,
-					// EnableSeparateRecognitionPerChannel: true,
+					AudioChannelCount: 1, // EnableSeparateRecognitionPerChannel: true,
 				},
 			},
 		},
 	}); err != nil {
 		log.Fatal(err)
 	}
-
-	file, err := os.Open("file.ogg")
-	defer file.Close()
 
 	// // throw away request
 	// stream.Send(&speechpb.StreamingRecognizeRequest{
@@ -118,27 +130,20 @@ func speechToText(bytesBuffer *bytes.Buffer) {
 	go func() {
 		// Pipe stdin to the API.
 		// buf := make([]byte, 1024)
-		// timer := time.NewTicker(time.Millisecond * 100)
-		// for {
-		// 	<-timer.C
-		// 	n, err := bytesBuffer.Read(buf)
-
-		buf := make([]byte, 1024)
 		for {
-			n, err := file.Read(buf)
-
-			// buf := <-bytesChan
-			logger.Infof("number of bytes sent: %d", n)
-			if n > 0 {
+			// n, err := bytesBuffer.Read(buf)
+			buf := <-bytesChan
+			logger.Infof("number of bytes sent: %d", len(buf))
+			if len(buf) > 0 {
 				if err := stream.Send(&speechpb.StreamingRecognizeRequest{
 					StreamingRequest: &speechpb.StreamingRecognizeRequest_AudioContent{
-						AudioContent: []byte("abcdeef"),
+						AudioContent: buf,
 					},
 				}); err != nil {
 					log.Printf("Could not send audio: %v", err)
 				}
 			}
-			if n == 0 {
+			if len(buf) == 0 {
 				// Nothing else to pipe, close the stream.
 				if err := stream.CloseSend(); err != nil {
 					log.Fatalf("Could not close stream: %v", err)
