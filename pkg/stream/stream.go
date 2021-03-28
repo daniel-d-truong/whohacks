@@ -14,8 +14,7 @@ import (
 	"log"
 	"strings"
 
-	"encoding/json"
-
+	"github.com/lithammer/shortuuid"
 	"github.com/pion/webrtc/v3"
 )
 
@@ -142,12 +141,11 @@ func speechToText(bytesChan <-chan []byte) {
 
 	logger.Infof("started running goroutine")
 
+	currentId := shortuuid.New()
 	for {
 		logger.Infof("expecting received stream")
 		resp, err := stream.Recv()
 		logger.Infof("response: %s", resp.String())
-
-		// id := random string
 
 		/*
 
@@ -175,7 +173,7 @@ func speechToText(bytesChan <-chan []byte) {
 			results := resp.GetResults()
 			if len(results) > 0 {
 				msg := Message{
-					ID:         "3749827",
+					ID:         currentId,
 					Transcript: resp.GetResults()[0].GetAlternatives()[0].GetTranscript(),
 					Name:       "Daniel",
 				}
@@ -186,6 +184,10 @@ func speechToText(bytesChan <-chan []byte) {
 				}
 
 				dc.Send(msgByte)
+				// check if we have finished
+				if resp.GetResults()[0].GetIsFinal() {
+					currentId = shortuuid.New()
+				}
 
 			}
 		}

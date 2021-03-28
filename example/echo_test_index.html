@@ -417,8 +417,10 @@
 
       clientRemote.ondatachannel = ({ channel }) => {
         channel.onmessage = ({ data }) => {
-          console.log(data);
-          remoteData.innerHTML = data;
+          let decodedString = String.fromCharCode.apply(null, new Uint8Array(data));
+          let obj = JSON.parse(decodedString);
+          console.log(obj);
+          remoteData.innerHTML = obj.transcript;
         };
       };
 
