@@ -35,7 +35,10 @@ class ProfilePage extends React.Component {
 
   handleNameInput = (e) => {
     this.setState({name: e.target.value});
-    console.log(e.target.value);
+  }
+
+  handleRoomInput = (e) => {
+    this.setState({room: e.target.value});
   }
 
   handleSubmit = formSubmitEvent => {
@@ -63,12 +66,13 @@ class ProfilePage extends React.Component {
               className="input-field flex-item"
               type="text" 
               placeholder="your name here" 
-              onChange={(e) => this.handleNameInput(e)}
+              onChange={this.handleNameInput}
               required/>
             <input
               className="input-field flex-item"
               type="text"
               placeholder="room code"
+              onChange={this.handleRoomInput}
               required/>
             <Link to={{
               pathname: "/video",
