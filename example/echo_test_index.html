@@ -417,6 +417,7 @@
 
       clientRemote.ondatachannel = ({ channel }) => {
         channel.onmessage = ({ data }) => {
+          console.log(data);
           remoteData.innerHTML = data;
         };
       };

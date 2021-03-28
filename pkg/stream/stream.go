@@ -1,8 +1,8 @@
 package stream
 
 import (
-	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -14,11 +14,21 @@ import (
 	"log"
 	"strings"
 
+	"encoding/json"
+
 	"github.com/pion/webrtc/v3"
-	"github.com/pion/webrtc/v3/pkg/media/oggwriter"
 )
 
+type Message struct {
+	ID         string `json:"id"`
+	Transcript string `json:"transcript"`
+	Name       string `json:"name"`
+}
+
+var dc *webrtc.DataChannel
+
 func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+
 	codec := track.Codec()
 	logger.Infof("calling onTrack with codec: %s", codec.MimeType)
 
@@ -32,19 +42,9 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 	if strings.EqualFold(codec.MimeType, webrtc.MimeTypeOpus) {
 		logger.Infof("Got Opus track")
 
-		var buf bytes.Buffer
-		audioWriter, err := oggwriter.NewWith(&buf, 16000, 1)
-		if err != nil {
-			audioWriter.Close()
-		}
-
 		go speechToText(audioStream)
 
-		// timer := time.NewTicker(time.Second)
-
 		for {
-			// n, _, err := track.Read(buf)
-
 			rtpPacket, _, err := track.ReadRTP()
 			if err != nil {
 				panic(err)
@@ -54,28 +54,8 @@ func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
 			audioChunk := <-audioChunkChan
 
 			audioStream <- audioChunk
-
-			// rtpPacket, _, err := track.ReadRTP()
-			// if err != nil {
-			// 	panic(err)
-			// }
-			// if err := audioWriter.WriteRTP(rtpPacket); err != nil {
-			// 	panic(err)
-			// }
-
-			// // // only read if we get to 1024 bytes?
-			// // if buf.Len() > 1024 {
-			// n, err := buf.Read(filledBuffer)
-			// if err != nil {
-			// 	panic(err)
-			// }
-
-			// audioStream <- filledBuffer[:n]
-			// }
-
 		}
 	}
-
 }
 
 func decode(decoder *opusDecoder, audioChunk []byte) chan []byte {
@@ -109,11 +89,14 @@ func speechToText(bytesChan <-chan []byte) {
 		StreamingRequest: &speechpb.StreamingRecognizeRequest_StreamingConfig{
 			StreamingConfig: &speechpb.StreamingRecognitionConfig{
 				Config: &speechpb.RecognitionConfig{
+					Model:             "video",
+					UseEnhanced:       true,
 					Encoding:          speechpb.RecognitionConfig_LINEAR16,
-					SampleRateHertz:   16000,
+					SampleRateHertz:   48000,
 					LanguageCode:      "en-US",
-					AudioChannelCount: 1, // EnableSeparateRecognitionPerChannel: true,
+					AudioChannelCount: 1,
 				},
+				InterimResults: true,
 			},
 		},
 	}); err != nil {
@@ -133,7 +116,7 @@ func speechToText(bytesChan <-chan []byte) {
 		for {
 			// n, err := bytesBuffer.Read(buf)
 			buf := <-bytesChan
-			logger.Infof("number of bytes sent: %d", len(buf))
+			// logger.Infof("number of bytes sent: %d", len(buf))
 			if len(buf) > 0 {
 				if err := stream.Send(&speechpb.StreamingRecognizeRequest{
 					StreamingRequest: &speechpb.StreamingRecognizeRequest_AudioContent{
@@ -163,6 +146,50 @@ func speechToText(bytesChan <-chan []byte) {
 		logger.Infof("expecting received stream")
 		resp, err := stream.Recv()
 		logger.Infof("response: %s", resp.String())
+
+		// id := random string
+
+		/*
+
+			this function will have a map
+			{
+				1: "oh baby"
+			}
+
+			each message sent:
+				{
+					"id": "1",
+					"transcript": "oh",
+					"name": "person speaking",
+					"timestamp": "date"
+				},
+				{
+					"id": "1",
+					"transcript": "oh baby"
+				}
+
+
+		*/
+
+		if dc != nil {
+			results := resp.GetResults()
+			if len(results) > 0 {
+				msg := Message{
+					ID:         "3749827",
+					Transcript: resp.GetResults()[0].GetAlternatives()[0].GetTranscript(),
+					Name:       "Daniel",
+				}
+
+				msgByte, err := json.Marshal(msg)
+				if err != nil {
+					panic(err)
+				}
+
+				dc.Send(msgByte)
+
+			}
+		}
+
 		if err == io.EOF {
 			break
 		}
@@ -213,6 +240,12 @@ func CreateClient(addr string, session string) {
 	err := c.Join(session)
 
 	// publish file to session if needed
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(err)
+	}
+
+	dc, err = c.CreateDataChannel("data2")
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(err)
