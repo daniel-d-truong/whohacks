@@ -186,6 +186,7 @@ func speechToText(bytesChan <-chan []byte) {
 				dc.Send(msgByte)
 				// check if we have finished
 				if resp.GetResults()[0].GetIsFinal() {
+					// if yes, generate a new id
 					currentId = shortuuid.New()
 				}
 

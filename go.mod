@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go v0.80.0
+	github.com/gofiber/fiber/v2 v2.6.0 // indirect
 	github.com/lithammer/shortuuid v3.0.0+incompatible
 	github.com/pion/ion-log v1.0.0
 	github.com/pion/ion-sdk-go v0.4.0
