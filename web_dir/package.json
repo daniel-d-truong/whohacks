@@ -9,6 +9,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "gatsby": "^3.1.2",
+    "ion-sdk-js": "^1.6.3",
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",
     "react-chat-bubble": "^0.8.7",

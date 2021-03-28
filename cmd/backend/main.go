@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/daniel-d-truong/whohacks/stream"
+	"github.com/daniel-d-truong/whohacks/pkg/stream"
 	sdk "github.com/pion/ion-sdk-go"
 )
 
@@ -39,5 +39,5 @@ func main() {
 		return c.SendString("Already joined room")
 	})
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":3001"))
 }
