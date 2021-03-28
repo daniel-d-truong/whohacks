@@ -22,7 +22,7 @@ class App extends Component {
             {/*All our Routes goes here!*/}
             <Switch>
                 <Route exact path="/" component={MainPage} />
-                <Route exact path="/profile" component={ProfilePage} /> 
+                <Route exact path="/begin" component={ProfilePage} /> 
                 <Route exact path="/video" component={VideoPage} />
                 <Route exact component={NotFoundPage} />
             </Switch>

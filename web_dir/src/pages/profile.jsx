@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import profile_image from '../images/profile_image.png';
 import './profile.css';
