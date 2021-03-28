@@ -3,22 +3,20 @@
     height: 60vh;
 }
 
-.d-flex div {
-    font-family: "Muli";
-    margin-left: 10%;
-    margin-bottom: 10%;
-    margin-top: 10%;
-    background-color: #EBEBEB;
-    padding: 1.5%;
-    width: 50vw;
-    overflow: auto;
-}
-
 .video_item {
     font-family: "Muli";
     margin-left: 10%;
-    margin-bottom: 10%;
+    margin-right: 10%;
     background-color: #EBEBEB;
     padding: 1.5%;
-    flex-basis: 50%;
+    width: 30vw;
+    height: 35vh;
+}
+
+.Messages {
+    font-family: "Muli";
+    background-color: #FAFAFA;
+    padding: 1.5%;
+    width: 20vw;
+    height: 76.5vh;
 }
