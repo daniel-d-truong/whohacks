@@ -1,11 +1,10 @@
 package stream
 
 import (
-	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 
 	speech "cloud.google.com/go/speech/apiv1"
 	logger "github.com/pion/ion-log"
@@ -15,68 +14,65 @@ import (
 	"log"
 	"strings"
 
+	"encoding/json"
+
 	"github.com/pion/webrtc/v3"
-	"github.com/pion/webrtc/v3/pkg/media/oggwriter"
 )
 
+type Message struct {
+	ID         string `json:"id"`
+	Transcript string `json:"transcript"`
+	Name       string `json:"name"`
+}
+
+var dc *webrtc.DataChannel
+
 func onTrack(track *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+
 	codec := track.Codec()
 	logger.Infof("calling onTrack with codec: %s", codec.MimeType)
 
-	// audioChan := make(chan []byte)
+	audioStream := make(chan []byte)
+
+	opusDecoder, err := newDecoder()
+	if err != nil {
+		panic(err)
+	}
 
 	if strings.EqualFold(codec.MimeType, webrtc.MimeTypeOpus) {
 		logger.Infof("Got Opus track")
 
-		var buf bytes.Buffer
-		audioWriter, err := oggwriter.NewWith(&buf, 16000, 1)
-		fileWriter, err := oggwriter.New("file.ogg", 16000, 1)
-		defer fileWriter.Close()
-
-		if err != nil {
-			audioWriter.Close()
-		}
-
-		go speechToText(&buf)
-
-		// timer := time.NewTicker(time.Second)
-		// filledBuffer := make([]byte, 1024)
+		go speechToText(audioStream)
 
 		for {
-			// n, _, err := track.Read(buf)
-
-			// // rtpPacket, _, err := track.ReadRTP()
-			// if err != nil {
-			// 	panic(err)
-			// }
-
-			// audioChan <- buf[:n]
-
 			rtpPacket, _, err := track.ReadRTP()
 			if err != nil {
 				panic(err)
 			}
-			if err := audioWriter.WriteRTP(rtpPacket); err != nil {
-				panic(err)
-			}
-			fileWriter.WriteRTP(rtpPacket)
 
-			// // // only read if we get to 1024 bytes?
-			// // if buf.Len() > 1024 {
-			// n, err := buf.Read(filledBuffer)
-			// if err != nil {
-			// 	panic(err)
-			// }
+			audioChunkChan := decode(opusDecoder, rtpPacket.Payload)
+			audioChunk := <-audioChunkChan
 
-			// audioChan <- filledBuffer[:n]
-			// }
-
+			audioStream <- audioChunk
 		}
 	}
-
 }
 
-func speechToText(bytesBuffer *bytes.Buffer) {
+func decode(decoder *opusDecoder, audioChunk []byte) chan []byte {
+	decodeBool := make(chan []byte)
+	go func() {
+		decodedChunk, err := decoder.decode(audioChunk)
+		if err != nil {
+			logger.Errorf("error received: %s", err.Error())
+			decodeBool <- []byte{}
+		}
+		decodeBool <- decodedChunk
+	}()
+
+	return decodeBool
+}
+
+func speechToText(bytesChan <-chan []byte) {
 	logger.Infof("calling speechToText")
 	ctx := context.Background()
 
@@ -93,20 +89,19 @@ func speechToText(bytesBuffer *bytes.Buffer) {
 		StreamingRequest: &speechpb.StreamingRecognizeRequest_StreamingConfig{
 			StreamingConfig: &speechpb.StreamingRecognitionConfig{
 				Config: &speechpb.RecognitionConfig{
-					Encoding:          speechpb.RecognitionConfig_OGG_OPUS,
-					SampleRateHertz:   16000,
+					Model:             "video",
+					UseEnhanced:       true,
+					Encoding:          speechpb.RecognitionConfig_LINEAR16,
+					SampleRateHertz:   48000,
 					LanguageCode:      "en-US",
 					AudioChannelCount: 1,
-					// EnableSeparateRecognitionPerChannel: true,
 				},
+				InterimResults: true,
 			},
 		},
 	}); err != nil {
 		log.Fatal(err)
 	}
-
-	file, err := os.Open("file.ogg")
-	defer file.Close()
 
 	// // throw away request
 	// stream.Send(&speechpb.StreamingRecognizeRequest{
@@ -118,27 +113,20 @@ func speechToText(bytesBuffer *bytes.Buffer) {
 	go func() {
 		// Pipe stdin to the API.
 		// buf := make([]byte, 1024)
-		// timer := time.NewTicker(time.Millisecond * 100)
-		// for {
-		// 	<-timer.C
-		// 	n, err := bytesBuffer.Read(buf)
-
-		buf := make([]byte, 1024)
 		for {
-			n, err := file.Read(buf)
-
-			// buf := <-bytesChan
-			logger.Infof("number of bytes sent: %d", n)
-			if n > 0 {
+			// n, err := bytesBuffer.Read(buf)
+			buf := <-bytesChan
+			// logger.Infof("number of bytes sent: %d", len(buf))
+			if len(buf) > 0 {
 				if err := stream.Send(&speechpb.StreamingRecognizeRequest{
 					StreamingRequest: &speechpb.StreamingRecognizeRequest_AudioContent{
-						AudioContent: []byte("abcdeef"),
+						AudioContent: buf,
 					},
 				}); err != nil {
 					log.Printf("Could not send audio: %v", err)
 				}
 			}
-			if n == 0 {
+			if len(buf) == 0 {
 				// Nothing else to pipe, close the stream.
 				if err := stream.CloseSend(); err != nil {
 					log.Fatalf("Could not close stream: %v", err)
@@ -158,6 +146,50 @@ func speechToText(bytesBuffer *bytes.Buffer) {
 		logger.Infof("expecting received stream")
 		resp, err := stream.Recv()
 		logger.Infof("response: %s", resp.String())
+
+		// id := random string
+
+		/*
+
+			this function will have a map
+			{
+				1: "oh baby"
+			}
+
+			each message sent:
+				{
+					"id": "1",
+					"transcript": "oh",
+					"name": "person speaking",
+					"timestamp": "date"
+				},
+				{
+					"id": "1",
+					"transcript": "oh baby"
+				}
+
+
+		*/
+
+		if dc != nil {
+			results := resp.GetResults()
+			if len(results) > 0 {
+				msg := Message{
+					ID:         "3749827",
+					Transcript: resp.GetResults()[0].GetAlternatives()[0].GetTranscript(),
+					Name:       "Daniel",
+				}
+
+				msgByte, err := json.Marshal(msg)
+				if err != nil {
+					panic(err)
+				}
+
+				dc.Send(msgByte)
+
+			}
+		}
+
 		if err == io.EOF {
 			break
 		}
@@ -208,6 +240,12 @@ func CreateClient(addr string, session string) {
 	err := c.Join(session)
 
 	// publish file to session if needed
+	if err != nil {
+		fmt.Println(err.Error())
+		panic(err)
+	}
+
+	dc, err = c.CreateDataChannel("data2")
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(err)
